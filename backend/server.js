@@ -16,7 +16,7 @@ const corsOptions = {
         // allow request with no origin (curl, same-origin, server-to-server)
         if (!origin) return cb(null, true)
         // allow any localhost /127.0.0.1 origin in development
-        if (/^https?:\/\/(localhost|127\.0\.0\.1\)(:\d+)?$/.test(origin)) {
+        if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
             return cb(null, true)
         }
         // Allow anything explicitly listed in CLIENT_URL (come-separated)
@@ -29,12 +29,21 @@ const corsOptions = {
 }
 
 app.use(cors(corsOptions))
-app.options("*", cors(corsOptions))
+//app.options("*", cors(corsOptions))
 app.use(express.json({ limit: "1mb" }))
 
 app.get("/api/health", (req, res) => {
     res.json({ status: "ok", time: new Date().toISOString() })
 })
 
+// Middleware settings
 app.use(notFound)
 app.use(errorHandler)
+
+const PORT = process.env.PORT || 8000
+
+connectDB().then(() => {
+    app.listen(PORT, () => {
+        console.log(`Server running on http://locahost:${PORT}`)
+    })
+})
